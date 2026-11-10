@@ -3,20 +3,17 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
 type Middleware struct {
-	logger  *zap.Logger
-	session *sessions.SessionRepo
+	logger *zap.Logger
+	srvc   AuthService
 }
 
-func NewMiddleware(logger *zap.Logger, rdb *redis.Client) *Middleware {
-	session := sessions.NewSessionRepo(rdb)
-	return &Middleware{logger: logger, session: session}
+func NewMiddleware(logger *zap.Logger, srvc AuthService) *Middleware {
+	return &Middleware{logger: logger, srvc: srvc}
 }
 
 func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
@@ -27,7 +24,7 @@ func (m *Middleware) AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		session, err := m.session.GetSession(c.Request.Context(), sessionID)
+		session, err := m.srvc.GetSession(c.Request.Context(), sessionID)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
