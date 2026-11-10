@@ -82,5 +82,16 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
+	sessionID, err := c.Cookie("session_id")
+	if err != nil {
+		response.Unauthorized(c, err, "failed get cookie", h.logger)
+		return
+	}
 
+	if err := h.srvc.Logout(c.Request.Context(), sessionID); err != nil {
+		response.InternalServerError(c, err, "failed logout user", h.logger)
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
