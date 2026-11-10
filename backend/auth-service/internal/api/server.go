@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/handlers"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,15 +21,17 @@ type AppConfig struct {
 
 type Server struct {
 	h      *handlers.Handlers
+	m      *middleware.Middleware
 	engine *gin.Engine
 	server *http.Server
 }
 
-func NewServer(cfg *AppConfig, h *handlers.Handlers) *Server {
+func NewServer(cfg *AppConfig, h *handlers.Handlers, m *middleware.Middleware) *Server {
 	engine := gin.New()
 	return &Server{
 		engine: engine,
 		h:      h,
+		m:      m,
 		server: &http.Server{
 			Addr:        ":" + cfg.Port,
 			Handler:     engine,
@@ -42,8 +45,8 @@ func (s *Server) Run() {
 	auth := api.Group("/auth")
 	{
 		auth.POST("/register", s.h.Auth.Register)
-		auth.POST("/login")
-		auth.GET("/logout")
+		auth.POST("/login", s.h.Auth.Login)
+		auth.GET("/logout", s.m.AuthMiddleware(), s.h.Auth.Logout)
 	}
 }
 
