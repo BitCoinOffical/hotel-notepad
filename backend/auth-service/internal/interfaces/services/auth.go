@@ -72,4 +72,31 @@ func (s *AuthService) Register(ctx context.Context, req *dto.RegisterDTO) (strin
 
 }
 
-func (s *AuthService) Login()
+func (s *AuthService) Login(ctx context.Context, req *dto.LoginDTO) (string, error) {
+	user, err := s.repo.GetUserByUserName(ctx, req.UserName)
+	if err != nil {
+		return "", fmt.Errorf("s.repo.GetUserByUserName: %w", err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
+		return "", fmt.Errorf("bcrypt.CompareHashAndPassword: %w", domain.ErrInvalidCredentials)
+	}
+
+	sessionID, err := jwtpkg.GenerateRandomString()
+	if err != nil {
+		return "", fmt.Errorf("jwtpkg.GenerateRandomString: %w", err)
+	}
+
+	session := models.Session{
+		UserID:    user.ID,
+		Username:  user.UserName,
+		Role:      user.Role,
+		CreatedAt: time.Now(),
+	}
+
+	if err := s.session.SaveSession(ctx, sessionID, &session); err != nil {
+		return "", fmt.Errorf("s.session.SaveSession: %w", err)
+	}
+
+	return sessionID, nil
+}
