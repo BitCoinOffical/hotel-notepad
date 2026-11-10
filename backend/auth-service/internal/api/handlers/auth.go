@@ -56,23 +56,15 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req dto.RegisterDTO
+	var req dto.LoginDTO
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		response.BadRequest(c, err, "invalid request", h.logger)
 		return
 	}
 
-	sessionID, err := h.srvc.Register(c.Request.Context(), &req)
+	sessionID, err := h.srvc.Login(c.Request.Context(), &req)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotMatch) {
-			response.BadRequest(c, err, "bad request", h.logger)
-			return
-		}
-		if errors.Is(err, domain.ErrUserConflict) {
-			response.Conflict(c, err, "user already exists", h.logger)
-			return
-		}
-		response.InternalServerError(c, err, "failed register user", h.logger)
+		response.InternalServerError(c, err, "failed login user", h.logger)
 		return
 	}
 
