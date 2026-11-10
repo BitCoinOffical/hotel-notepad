@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/config"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/migrations"
 	postgresdb "github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/postgres"
 	redisdb "github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/redis"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api"
@@ -51,6 +52,11 @@ func main() {
 	}
 	logger.Info("postgres pool applied successfully")
 
+	if err := migrations.NewMigrations(pool); err != nil {
+		logger.Fatal("faailed start migrations", zap.Error(err))
+	}
+	logger.Info("migrations applied successfully")
+
 	rdb, err := redisdb.NewRedis(context.Background(), &redisdb.RedisConfig{
 		Host: cfg.Redis.Host,
 		Port: cfg.Redis.Port,
@@ -78,7 +84,16 @@ func main() {
 	defer cancel()
 	logger.Info("received a signal indicating the completion of operations")
 
+	postgresdb.ClosePool(pool)
+	logger.Info("pool closed")
+
+	if err := rdb.Close(); err != nil {
+		logger.Error("failed shut down server", zap.Error(err))
+	}
+	logger.Info("rdb closed")
+
 	if err := server.ShutDown(shutdownCtx); err != nil {
 		logger.Error("failed shut down server", zap.Error(err))
 	}
+	logger.Info("server shut down")
 }
