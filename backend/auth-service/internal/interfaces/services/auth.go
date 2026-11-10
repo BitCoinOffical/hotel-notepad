@@ -100,3 +100,10 @@ func (s *AuthService) Login(ctx context.Context, req *dto.LoginDTO) (string, err
 
 	return sessionID, nil
 }
+
+func (s *AuthService) Logout(ctx context.Context, sessionID string) error {
+	if err := s.session.DeleteSession(ctx, sessionID); err != nil {
+		return fmt.Errorf("s.session.DeleteSession: %w", err)
+	}
+	return nil
+}
