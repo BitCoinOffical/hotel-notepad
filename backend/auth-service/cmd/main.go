@@ -70,7 +70,7 @@ func main() {
 
 	srvc := handlers.NewServices(pool, rdb)
 	h := handlers.NewHandlers(srvc, logger)
-	m := middleware.NewMiddleware(logger, rdb)
+	m := middleware.NewMiddleware(logger, srvc.Auth)
 
 	server := api.NewServer(&api.AppConfig{
 		Port: cfg.App.Port,
