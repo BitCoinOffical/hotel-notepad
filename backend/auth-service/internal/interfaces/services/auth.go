@@ -8,18 +8,16 @@ import (
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain/dto"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain/models"
-	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/repo"
-	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/sessions"
 	jwtpkg "github.com/BitCoinOffical/hotel-notepad/auth-service/pkg/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	repo    *repo.AuthRepo
-	session *sessions.SessionRepo
+	repo    AuthRepo
+	session SessionRepo
 }
 
-func NewAuthService(repo *repo.AuthRepo, session *sessions.SessionRepo) *AuthService {
+func NewAuthService(repo AuthRepo, session SessionRepo) *AuthService {
 	return &AuthService{repo: repo, session: session}
 }
 
@@ -106,4 +104,12 @@ func (s *AuthService) Logout(ctx context.Context, sessionID string) error {
 		return fmt.Errorf("s.session.DeleteSession: %w", err)
 	}
 	return nil
+}
+
+func (s *AuthService) GetSession(ctx context.Context, sessionID string) (*models.Session, error) {
+	session, err := s.session.GetSession(ctx, sessionID)
+	if err != nil {
+		return nil, fmt.Errorf("s.session.GetSession: %w", err)
+	}
+	return session, nil
 }
