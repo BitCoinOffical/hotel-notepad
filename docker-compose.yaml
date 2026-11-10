@@ -1,0 +1,53 @@
+services:
+  auth-service:
+    ports:
+      - "8080:8080"
+    build: ./backend/auth-service
+    command: [./auth-service]
+    env_file:
+      - ./backend/auth-service/.env
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+
+  postgres-auth:
+    image: "postgres:18"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql
+    env_file:
+      - ./backend/auth-service/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    
+  notebook-service:
+    ports:
+      - "8080:8080"
+    build: ./backend/notebook-service
+    command: [./notebook-service]
+    env_file:
+      - ./backend/notebook-service/.env
+    depends_on:
+      postgres-notebook:
+        condition: service_healthy
+
+  postgres-notebook:
+    image: "postgres:18"
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_notebook_data:/var/lib/postgresql
+    env_file:
+      - ./backend/notebook-service/.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d guest_db"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+volumes:
+  postgres_auth_data:
+  postgres_notebook_data:
