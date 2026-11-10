@@ -13,6 +13,7 @@ import (
 	redisdb "github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/redis"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/handlers"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/middleware"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -64,10 +65,11 @@ func main() {
 
 	srvc := handlers.NewServices(pool, rdb)
 	h := handlers.NewHandlers(srvc, logger)
+	m := middleware.NewMiddleware(logger, rdb)
 
 	server := api.NewServer(&api.AppConfig{
 		Port: cfg.App.Port,
-	}, h)
+	}, h, m)
 
 	server.Run()
 
