@@ -23,10 +23,19 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+      
+  redis-auth:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    env_file:
+      - ./backend/auth-service/.env
+    volumes:
+      - redis_auth_data:/data
     
   notebook-service:
     ports:
-      - "8080:8080"
+      - "8081:8081"
     build: ./backend/notebook-service
     command: [./notebook-service]
     env_file:
@@ -51,3 +60,4 @@ services:
 volumes:
   postgres_auth_data:
   postgres_notebook_data:
+  redis_auth_data:
