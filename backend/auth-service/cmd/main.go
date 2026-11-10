@@ -60,7 +60,6 @@ func main() {
 	rdb, err := redisdb.NewRedis(context.Background(), &redisdb.RedisConfig{
 		Host: cfg.Redis.Host,
 		Port: cfg.Redis.Port,
-		User: cfg.Redis.User,
 		Pass: cfg.Redis.Pass,
 		DB:   cfg.Redis.DB,
 	})
