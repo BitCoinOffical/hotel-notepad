@@ -37,10 +37,10 @@ func (s *SessionRepo) SaveSession(ctx context.Context, sessionID string, session
 	return nil
 }
 
-func (s *SessionRepo) GetSession() {
-
-}
-
-func (s *SessionRepo) DeleteSession() {
-
+func (s *SessionRepo) DeleteSession(ctx context.Context, sessionID string) error {
+	key := sessionPrefix + sessionID
+	if err := s.rdb.Del(ctx, key).Err(); err != nil {
+		return fmt.Errorf("s.rdb.Del: %w", err)
+	}
+	return nil
 }
