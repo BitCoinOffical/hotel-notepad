@@ -7,17 +7,16 @@ import (
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/response"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain/dto"
-	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/services"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 type AuthHandler struct {
-	srvc   *services.AuthService
+	srvc   AuthService
 	logger *zap.Logger
 }
 
-func NewAuthHandler(srvc *services.AuthService, logger *zap.Logger) *AuthHandler {
+func NewAuthHandler(srvc AuthService, logger *zap.Logger) *AuthHandler {
 	return &AuthHandler{srvc: srvc, logger: logger}
 }
 
