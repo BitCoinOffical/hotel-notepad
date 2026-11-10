@@ -36,8 +36,8 @@ type RedisConfig struct {
 }
 
 type AppConfig struct {
-	Port       string `env:"PORT"`
-	DebugLevel Level  `env:"DEBUG_LEVEL"`
+	Port       string `env:"PORT,required"`
+	DebugLevel Level  `env:"DEBUG_LEVEL,required"`
 }
 
 func NewLoad() (*Config, error) {
