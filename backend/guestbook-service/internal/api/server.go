@@ -33,8 +33,15 @@ func NewServer(cfg *AppConfig) *Server {
 }
 
 func (s *Server) Run() {
-	s.engine.Group("/api/v1")
-
+	api := s.engine.Group("/api/v1")
+	notebook := api.Group("/guestbook")
+	{
+		notebook.POST("/entries")
+		notebook.GET("/entries")
+		notebook.GET("/entries/:guests_id")
+		notebook.PATCH("/entries/:guests_id")
+		notebook.DELETE("/entries/:guests_id")
+	}
 }
 
 func (s *Server) ShutDown() {

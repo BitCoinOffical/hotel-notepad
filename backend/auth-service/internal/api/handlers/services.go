@@ -1,6 +1,10 @@
 package handlers
 
 import (
+	"context"
+
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain/dto"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/domain/models"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/repo"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/services"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/interfaces/sessions"
@@ -8,6 +12,14 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
+
+type AuthService interface {
+	Register(ctx context.Context, req *dto.RegisterDTO) (string, error)
+	Login(ctx context.Context, req *dto.LoginDTO) (string, error)
+	Logout(ctx context.Context, sessionID string) error
+
+	GetSession(ctx context.Context, sessionID string) (*models.Session, error)
+}
 
 type Services struct {
 	Auth *services.AuthService

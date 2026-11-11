@@ -30,14 +30,13 @@ type PostgresConfig struct {
 type RedisConfig struct {
 	Host string `env:"REDIS_HOST,required"`
 	Port string `env:"REDIS_PORT,required"`
-	User string `env:"REDIS_USERNAME,required"`
 	Pass string `env:"REDIS_PASSWORD,required"`
 	DB   int    `env:"REDIS_DB,required"`
 }
 
 type AppConfig struct {
-	Port       string `env:"PORT"`
-	DebugLevel Level  `env:"DEBUG_LEVEL"`
+	Port       string `env:"PORT,required"`
+	DebugLevel Level  `env:"DEBUG_LEVEL,required"`
 }
 
 func NewLoad() (*Config, error) {

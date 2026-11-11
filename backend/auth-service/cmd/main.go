@@ -9,10 +9,12 @@ import (
 	"time"
 
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/config"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/migrations"
 	postgresdb "github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/postgres"
 	redisdb "github.com/BitCoinOffical/hotel-notepad/auth-service/internal/adapters/redis"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/handlers"
+	"github.com/BitCoinOffical/hotel-notepad/auth-service/internal/api/middleware"
 	"github.com/BitCoinOffical/hotel-notepad/auth-service/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -50,10 +52,14 @@ func main() {
 	}
 	logger.Info("postgres pool applied successfully")
 
+	if err := migrations.NewMigrations(pool); err != nil {
+		logger.Fatal("faailed start migrations", zap.Error(err))
+	}
+	logger.Info("migrations applied successfully")
+
 	rdb, err := redisdb.NewRedis(context.Background(), &redisdb.RedisConfig{
 		Host: cfg.Redis.Host,
 		Port: cfg.Redis.Port,
-		User: cfg.Redis.User,
 		Pass: cfg.Redis.Pass,
 		DB:   cfg.Redis.DB,
 	})
@@ -64,10 +70,11 @@ func main() {
 
 	srvc := handlers.NewServices(pool, rdb)
 	h := handlers.NewHandlers(srvc, logger)
+	m := middleware.NewMiddleware(logger, srvc.Auth)
 
 	server := api.NewServer(&api.AppConfig{
 		Port: cfg.App.Port,
-	}, h)
+	}, h, m)
 
 	server.Run()
 
@@ -76,7 +83,16 @@ func main() {
 	defer cancel()
 	logger.Info("received a signal indicating the completion of operations")
 
+	postgresdb.ClosePool(pool)
+	logger.Info("pool closed")
+
+	if err := rdb.Close(); err != nil {
+		logger.Error("failed shut down server", zap.Error(err))
+	}
+	logger.Info("rdb closed")
+
 	if err := server.ShutDown(shutdownCtx); err != nil {
 		logger.Error("failed shut down server", zap.Error(err))
 	}
+	logger.Info("server shut down")
 }
