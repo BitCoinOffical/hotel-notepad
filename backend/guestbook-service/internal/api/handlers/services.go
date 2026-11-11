@@ -12,7 +12,7 @@ import (
 )
 
 type GuestBookService interface {
-	CreateEntry(ctx context.Context, req *dto.CreateGuestDTO) error
+	CreateEntry(ctx context.Context, userID string, req *dto.CreateGuestDTO) error
 	GetEntries(ctx context.Context, userID string) ([]models.Guest, error)
 	GetEntryByID(ctx context.Context, id, userID string) (*models.Guest, error)
 	UpdateEntry(ctx context.Context, id, userID string, req *dto.UpdateGuestDTO) (*models.Guest, error)
