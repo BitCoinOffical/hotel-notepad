@@ -11,7 +11,7 @@ type Guest struct {
 	Note          string    `db:"note"`
 	Phone         int       `db:"phone"`
 	IsDelete      bool      `db:"is_delete"`
-	CurrentDate   time.Time `db:"current_date"`
+	ArrivalDate   time.Time `db:"arrival_date"`
 	DepartureDate time.Time `db:"departure_date"`
 
 	CreatedAt time.Time `db:"created_at"`
@@ -24,6 +24,6 @@ type UpdateGuest struct {
 	LastName      *string    `db:"last_name"`
 	Note          *string    `db:"note"`
 	Phone         *int       `db:"phone"`
-	CurrentDate   *time.Time `db:"current_date"`
+	ArrivalDate   *time.Time `db:"arrival_date"`
 	DepartureDate *time.Time `db:"departure_date"`
 }
