@@ -27,7 +27,7 @@ type Services struct {
 func NewServices(pool *pgxpool.Pool) *Services {
 	repo := repo.NewGuestBookRepo(pool)
 
-	guest := services.NewGuestBookHandler(repo)
+	guest := services.NewGuestBookService(repo)
 	return &Services{Guest: guest}
 }
 
