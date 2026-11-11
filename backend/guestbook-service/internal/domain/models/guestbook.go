@@ -8,7 +8,7 @@ type Guest struct {
 	FirstName     string    `db:"first_name"`
 	MidName       string    `db:"mid_name"`
 	LastName      string    `db:"last_name"`
-	Note          string    `db:"note"`
+	Note          *string   `db:"note"`
 	Phone         int       `db:"phone"`
 	IsDelete      bool      `db:"is_delete"`
 	ArrivalDate   time.Time `db:"arrival_date"`

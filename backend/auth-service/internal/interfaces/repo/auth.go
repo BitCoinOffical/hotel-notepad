@@ -27,9 +27,17 @@ func (r *AuthRepo) SaveUser(ctx context.Context, user *models.User) (string, err
 }
 
 func (r *AuthRepo) GetUserByUserName(ctx context.Context, username string) (*models.User, error) {
-	sql := `SELECT id, username, password_hash, role FROM users WHERE username = $1`
+	sql := `SELECT id, username, password_hash, role, created_at, updated_at FROM users WHERE username = $1`
+
 	var user models.User
-	if err := r.pool.QueryRow(ctx, sql, username).Scan(&user); err != nil {
+	if err := r.pool.QueryRow(ctx, sql, username).Scan(
+		&user.ID,
+		&user.UserName,
+		&user.PasswordHash,
+		&user.Role,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	); err != nil {
 		return nil, fmt.Errorf("r.pool.QueryRow: %w", err)
 	}
 	return &user, nil

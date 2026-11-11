@@ -47,9 +47,8 @@ func (s *AuthService) Register(ctx context.Context, req *dto.RegisterDTO) (strin
 
 	userID, err := s.repo.SaveUser(ctx, &user)
 	if err != nil {
-		return "", fmt.Errorf("s.repo.SaveUser")
+		return "", fmt.Errorf("s.repo.SaveUser: %w", err)
 	}
-
 	sessionID, err := jwtpkg.GenerateRandomString()
 	if err != nil {
 		return "", fmt.Errorf("jwtpkg.GenerateRandomString: %w", err)

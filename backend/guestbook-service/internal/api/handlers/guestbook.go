@@ -22,12 +22,17 @@ func NewGuestBookHandler(logger *zap.Logger, srvc GuestBookService) *GuestBookHa
 }
 
 func (h *GuestBookHandler) CreateEntry(c *gin.Context) {
+	session, err := middleware.GetUserSession(c)
+	if err != nil {
+		response.Unauthorized(c, err, "failed get user session", h.logger)
+		return
+	}
 	var req dto.CreateGuestDTO
 	if err := c.ShouldBindBodyWithJSON(&req); err != nil {
 		response.BadRequest(c, err, "invalid request", h.logger)
 		return
 	}
-	if err := h.srvc.CreateEntry(c.Request.Context(), &req); err != nil {
+	if err := h.srvc.CreateEntry(c.Request.Context(), session.UserID, &req); err != nil {
 		response.InternalServerError(c, err, "failed create entry", h.logger)
 		return
 	}
@@ -58,7 +63,7 @@ func (h *GuestBookHandler) GetEntryByID(c *gin.Context) {
 		return
 	}
 
-	guest, err := h.srvc.GetEntryByID(c.Request.Context(), session.UserID, guestID)
+	guest, err := h.srvc.GetEntryByID(c.Request.Context(), guestID, session.UserID)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			response.NotFound(c, err, "entry not found", h.logger)
@@ -99,7 +104,7 @@ func (h *GuestBookHandler) DeleteEntry(c *gin.Context) {
 		response.Unauthorized(c, err, "failed get user session", h.logger)
 		return
 	}
-	if err := h.srvc.DeleteEntry(c.Request.Context(), session.UserID, guestID); err != nil {
+	if err := h.srvc.DeleteEntry(c.Request.Context(), guestID, session.UserID); err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			response.NotFound(c, err, "entry not found", h.logger)
 			return
@@ -126,7 +131,7 @@ func (h *GuestBookHandler) SearchEntry(c *gin.Context) {
 			response.NotFound(c, err, "entry not found", h.logger)
 			return
 		}
-		response.InternalServerError(c, err, "failed delete entry", h.logger)
+		response.InternalServerError(c, err, "failed search entry", h.logger)
 		return
 	}
 
