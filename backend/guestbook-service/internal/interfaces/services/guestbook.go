@@ -16,12 +16,13 @@ func NewGuestBookService(repo GuestBookRepo) *GuestBookService {
 	return &GuestBookService{repo: repo}
 }
 
-func (s *GuestBookService) CreateEntry(ctx context.Context, req *dto.CreateGuestDTO) error {
+func (s *GuestBookService) CreateEntry(ctx context.Context, userID string, req *dto.CreateGuestDTO) error {
 	guest := models.Guest{
+		UserID:        userID,
 		FirstName:     req.FirstName,
 		MidName:       req.MidName,
 		LastName:      req.LastName,
-		Note:          *req.Note,
+		Note:          req.Note,
 		Phone:         req.Phone,
 		ArrivalDate:   req.ArrivalDate,
 		DepartureDate: req.DepartureDate,
