@@ -78,7 +78,10 @@ func main() {
 		Port: cfg.App.Port,
 	}, h, m)
 
-	server.Run()
+	if err := server.Run(); err != nil {
+		logger.Fatal("failed register endpoints", zap.Error(err))
+	}
+	logger.Info("register endpoints complate")
 
 	<-ctx.Done()
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeoutSecond*time.Second)

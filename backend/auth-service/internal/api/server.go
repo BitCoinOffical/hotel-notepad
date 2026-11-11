@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -40,7 +41,7 @@ func NewServer(cfg *AppConfig, h *handlers.Handlers, m *middleware.Middleware) *
 	}
 }
 
-func (s *Server) Run() {
+func (s *Server) Run() error {
 	api := s.engine.Group("/api/v1")
 	auth := api.Group("/auth")
 	{
@@ -48,6 +49,11 @@ func (s *Server) Run() {
 		auth.POST("/login", s.h.Auth.Login)
 		auth.GET("/logout", s.m.AuthMiddleware(), s.h.Auth.Logout)
 	}
+
+	if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return fmt.Errorf("s.server.ListenAndServe: %w", err)
+	}
+	return nil
 }
 
 func (s *Server) ShutDown(ctx context.Context) error {

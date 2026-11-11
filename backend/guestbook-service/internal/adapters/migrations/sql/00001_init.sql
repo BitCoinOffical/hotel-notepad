@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS guests (
     mid_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     note VARCHAR(2048),
-    phone INTEGER NOT NULL,
+    phone BIGINT NOT NULL,
     is_delete BOOLEAN DEFAULT FALSE,
     arrival_date TIMESTAMPTZ NOT NULL,
     departure_date TIMESTAMPTZ NOT NULL,
