@@ -31,7 +31,7 @@ func NewServer(cfg *AppConfig, h *handlers.Handlers, m *middleware.Middleware) *
 	return &Server{
 		h:      h,
 		m:      m,
-		engine: &gin.Engine{},
+		engine: engine,
 		server: &http.Server{
 			Addr:        ":" + cfg.Port,
 			Handler:     engine,
