@@ -57,8 +57,24 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-      
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      AUTH_PROXY_TARGET: http://auth-service:8080
+      GUESTBOOK_PROXY_TARGET: http://guestbook-service:8081
+    depends_on:
+      - auth-service
+      - guestbook-service
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    restart: unless-stopped
+    
 volumes:
   postgres_auth_data:
   postgres_guestbook_data:
   redis_data:
+  frontend_node_modules:
