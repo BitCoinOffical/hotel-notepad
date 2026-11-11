@@ -12,7 +12,7 @@ type GuestBookService struct {
 	repo GuestBookRepo
 }
 
-func NewGuestBookHandler(repo GuestBookRepo) *GuestBookService {
+func NewGuestBookService(repo GuestBookRepo) *GuestBookService {
 	return &GuestBookService{repo: repo}
 }
 
@@ -23,7 +23,7 @@ func (s *GuestBookService) CreateEntry(ctx context.Context, req *dto.CreateGuest
 		LastName:      req.LastName,
 		Note:          *req.Note,
 		Phone:         req.Phone,
-		CurrentDate:   req.CurrentDate,
+		ArrivalDate:   req.ArrivalDate,
 		DepartureDate: req.DepartureDate,
 	}
 	if err := s.repo.CreateEntry(ctx, &guest); err != nil {
@@ -53,7 +53,7 @@ func (s *GuestBookService) UpdateEntry(ctx context.Context, id, userID string, r
 		LastName:      req.LastName,
 		Note:          req.Note,
 		Phone:         req.Phone,
-		CurrentDate:   req.CurrentDate,
+		ArrivalDate:   req.ArrivalDate,
 		DepartureDate: req.DepartureDate,
 	}
 	newguest, err := s.repo.UpdateEntry(ctx, id, userID, &guest)
