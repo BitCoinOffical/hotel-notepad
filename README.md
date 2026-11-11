@@ -1,6 +1,10 @@
 # Hotel Notepad
 
 Записная книжка отеля. Тестовое задание Backend + Frontend.
+### Общая схема
+
+![Общая архитектура Hotel Notepad](docs/architecture/Hotel_Notepad.jpg)
+
 
 ## Запуск
 
