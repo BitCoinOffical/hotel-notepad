@@ -57,6 +57,15 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+
+  redis-guestbook:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    env_file:
+      - ./backend/guestbook-service/.env
+    volumes:
+      - redis_auth_data:/data
 volumes:
   postgres_auth_data:
   postgres_guestbook_data:
