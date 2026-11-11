@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -40,19 +41,24 @@ func NewServer(cfg *AppConfig, h *handlers.Handlers, m *middleware.Middleware) *
 	}
 }
 
-func (s *Server) Run() {
+func (s *Server) Run() error {
 	api := s.engine.Group("/api/v1")
 	notebook := api.Group("/guestbook")
 	notebook.Use(s.m.AuthMiddleware())
 	{
 		notebook.POST("/entries", s.h.Guest.CreateEntry)
 		notebook.GET("/entries", s.h.Guest.GetEntries)
-		notebook.GET("/entries/:guests_id", s.h.Guest.GetEntryByID)
-		notebook.PATCH("/entries/:guests_id", s.h.Guest.UpdateEntry)
-		notebook.DELETE("/entries/:guests_id", s.h.Guest.UpdateEntry)
+		notebook.GET("/entries/:guest_id", s.h.Guest.GetEntryByID)
+		notebook.PATCH("/entries/:guest_id", s.h.Guest.UpdateEntry)
+		notebook.DELETE("/entries/:guest_id", s.h.Guest.DeleteEntry)
 
-		notebook.GET("/entries/search")
+		notebook.GET("/entries/search", s.h.Guest.SearchEntry)
 	}
+
+	if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return fmt.Errorf("s.server.ListenAndServe: %w", err)
+	}
+	return nil
 }
 
 func (s *Server) ShutDown(ctx context.Context) error {
