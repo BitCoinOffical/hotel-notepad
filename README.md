@@ -110,3 +110,5 @@ Backend:
 **Тестирование:** Testify, GoMock, Testcontainers.
 
 **Инфраструктура:** Docker, Docker Compose.
+
+**Архитектура и принципы:** Clean Architecture, SOLID, Graceful Shutdown.
