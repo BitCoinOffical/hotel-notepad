@@ -20,7 +20,7 @@ type PostgresConfig struct {
 func NewPool(ctx context.Context, cfg *PostgresConfig) (*pgxpool.Pool, error) {
 	conn := url.URL{
 		Scheme: "postgres",
-		User:   url.User(cfg.User),
+		User:   url.UserPassword(cfg.User, cfg.Pass),
 		Host:   net.JoinHostPort(cfg.Host, cfg.Port),
 		Path:   cfg.DB,
 	}
