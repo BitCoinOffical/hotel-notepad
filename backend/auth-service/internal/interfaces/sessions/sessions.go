@@ -40,13 +40,18 @@ func (s *SessionRepo) SaveSession(ctx context.Context, sessionID string, session
 func (s *SessionRepo) GetSession(ctx context.Context, sessionID string) (*models.Session, error) {
 	key := sessionPrefix + sessionID
 
-	var session models.Session
-	if err := s.rdb.Get(ctx, key).Scan(&session); err != nil {
+	value, err := s.rdb.Get(ctx, key).Result()
+	if err != nil {
 		return nil, fmt.Errorf("s.rdb.Get: %w", err)
 	}
+
+	var session models.Session
+	if err := json.Unmarshal([]byte(value), &session); err != nil {
+		return nil, fmt.Errorf("json.Unmarshal: %w", err)
+	}
+
 	return &session, nil
 }
-
 func (s *SessionRepo) DeleteSession(ctx context.Context, sessionID string) error {
 	key := sessionPrefix + sessionID
 	if err := s.rdb.Del(ctx, key).Err(); err != nil {
