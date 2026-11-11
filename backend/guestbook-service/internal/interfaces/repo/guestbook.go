@@ -24,11 +24,11 @@ func NewGuestBookRepo(pool *pgxpool.Pool) *GuestBookRepo {
 
 func (r *GuestBookRepo) CreateEntry(ctx context.Context, guest *models.Guest) error {
 	sql := `INSER INTO guests 
-	(user_id, first_name, mid_name, last_name, note, phone, current_date, departure_date)
+	(user_id, first_name, mid_name, last_name, note, phone, arrival_date, departure_date)
 	VALUES
 	($1, $2, $3, $4, $5, $6, $7, $8)
 	`
-	_, err := r.pool.Exec(ctx, sql, guest.UserID, guest.FirstName, guest.MidName, guest.LastName, guest.Note, guest.Phone, guest.CurrentDate, guest.DepartureDate)
+	_, err := r.pool.Exec(ctx, sql, guest.UserID, guest.FirstName, guest.MidName, guest.LastName, guest.Note, guest.Phone, guest.ArrivalDate, guest.DepartureDate)
 	if err != nil {
 		return fmt.Errorf("r.pool.Exec: %w", err)
 	}
@@ -43,7 +43,7 @@ func (r *GuestBookRepo) GetEntries(ctx context.Context, userID string) ([]models
 	last_name, 
 	note, 
 	phone, 
-	current_date, 
+	arrival_date, 
 	departure_date, 
 	created_at, 
 	updated_at
@@ -63,7 +63,7 @@ func (r *GuestBookRepo) GetEntries(ctx context.Context, userID string) ([]models
 			&guest.LastName,
 			&guest.Note,
 			&guest.Phone,
-			&guest.CurrentDate,
+			&guest.ArrivalDate,
 			&guest.DepartureDate,
 			&guest.CreatedAt,
 			&guest.UpdatedAt,
@@ -87,7 +87,7 @@ func (r *GuestBookRepo) GetEntryByID(ctx context.Context, id, userID string) (*m
 	mid_name, 
 	last_name, 
 	note, phone, 
-	current_date, 
+	arrival_date, 
 	departure_date, 
 	created_at, 
 	updated_at
@@ -101,7 +101,7 @@ func (r *GuestBookRepo) GetEntryByID(ctx context.Context, id, userID string) (*m
 		&guest.LastName,
 		&guest.Note,
 		&guest.Phone,
-		&guest.CurrentDate,
+		&guest.ArrivalDate,
 		&guest.DepartureDate,
 		&guest.CreatedAt,
 		&guest.UpdatedAt)
@@ -118,7 +118,7 @@ func (r *GuestBookRepo) UpdateEntry(ctx context.Context, id, userID string, gues
 	builder := squirrel.Update("guests").
 		Where(squirrel.Eq{"id": id}, squirrel.Eq{"user_id": userID}).
 		PlaceholderFormat(squirrel.Dollar).
-		Suffix("RETURNING id, user_id, first_name, mid_name,  last_name,  note, phone,  current_date,  departure_date,  created_at,  updated_at")
+		Suffix("RETURNING id, user_id, first_name, mid_name,  last_name,  note, phone,  arrival_date,  departure_date,  created_at,  updated_at")
 	if guest.FirstName != nil {
 		builder.Set("first_name", guest.FirstName)
 	}
@@ -134,8 +134,8 @@ func (r *GuestBookRepo) UpdateEntry(ctx context.Context, id, userID string, gues
 	if guest.Phone != nil {
 		builder.Set("phone", guest.Phone)
 	}
-	if guest.CurrentDate != nil {
-		builder.Set("current_date", guest.CurrentDate)
+	if guest.ArrivalDate != nil {
+		builder.Set("arrival_date", guest.ArrivalDate)
 	}
 	if guest.DepartureDate != nil {
 		builder.Set("departure_date", guest.DepartureDate)
@@ -166,7 +166,7 @@ func (r *GuestBookRepo) DeleteEntry(ctx context.Context, id, userID string) erro
 	return nil
 }
 func (r *GuestBookRepo) SearchEntry(ctx context.Context, userID string, firstName, midName, lastName string) (*models.Guest, error) {
-	builder := squirrel.Select("id, user_id, first_name, mid_name, last_name, note, phone, current_date, departure_date, created_at, updated_at").
+	builder := squirrel.Select("id, user_id, first_name, mid_name, last_name, note, phone, arrival_date, departure_date, created_at, updated_at").
 		From("guests").Where(squirrel.Eq{"user_id": userID}).
 		PlaceholderFormat(squirrel.Dollar)
 	if strings.TrimSpace(firstName) != "" {
